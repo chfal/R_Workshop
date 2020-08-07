@@ -25,7 +25,7 @@ Looking at the dataset, we can see that the GRE scores do seem to show a normal 
   
   Answer: Use a Shapiro-Wilk test!
   
-  ```{r}
+```{r}
 shapiro.test(grad_school$gre)
 ```
 
@@ -74,12 +74,48 @@ Enter _pivot_longer()_ from dplyr. We use the pipe! In pivot longer, the first a
 
 ```{r}
 long_spotify <- short_spotify %>%
-  pivot_longer(cols=c("acoustic","speaking","popularity","energy","duration","dance","dB","live","valence","bpm"),names_to="type of metric", values_to="score")
+  pivot_longer(cols=c("popularity","duration","dB","bpm"),names_to="type of metric", values_to="score")
 ```
 
 ## Pivot Wider
 
+# Day 3: Iris Analyses
+
+Here is a sample workflow for the Iris dataset we'll be working with on Day 3.
+
+### Reading in Data
+
+```{r}
+iris <- read_csv("Iris.csv")
+```
+
+### Petal Length, Petal Width
+
+```{r}
+ggplot(iris, aes(x=Petal.Length, y=Petal.Width, color=Species)) +
+  geom_point() +
+  labs(x="Petal Length", y="Petal Width", title="Petal Length vs. Petal Width, Sorted by Species")
+```
 
 
-# Day Three: MORE HERE
+A boxplot of sepal length by species is below.
 
+```{r}
+ggplot(iris, aes(x=Sepal.Length, group=Species, y=Species, fill=Species)) +
+  geom_boxplot()
+```
+
+We can see from the boxplot and scatterplot thatvirginica is consistently the largest flower. One of the things that we might consider is examining the ratio of flower sizes. Sometimes that changes things!
+
+To do this we are going to use dplyr & ggplot2.
+
+```{r}
+iris %>%
+  mutate(petal_ratio = Petal.Length/Petal.Width) %>%
+  ggplot(aes(x=petal_ratio, y=Species, group=Species, fill=Species)) +
+  geom_boxplot()
+```
+
+We can see that virginica is clearly the largest flower but has a different (smaller) petal length to petal width ratio than the other flowers.
+
+These are just a few ideas I wanted to come prepared with to the R workshop. Feel free to come up with your own!

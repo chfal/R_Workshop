@@ -13,7 +13,7 @@ library(tidyverse)
 
 Today we're going to be synthesizing and implementing Tidyverse! If today's RMarkdown looks a little bit empty to you, that's because we're going to be all making it together!
 
-However, I'll reupdate the GitHub at the end so everyone has working code by the end of the day. In addition, to see how I prepared for this workshop (mainly because live coding demos stress me out), check out the "iris_analyses.Rmd" folder.
+However, I'll reupdate the GitHub at the end so everyone has working code by the end of the day. In addition, to see how I prepared for this workshop (mainly because live coding demos stress me out), check out the "bonus_content.Rmd" file, Day 3.
 
 # Putting it all together
 
