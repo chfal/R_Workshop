@@ -7,15 +7,17 @@ output: html_document
 
 ## A few extra fun things that I thought might take up too much time but are still useful to learn to do.
 
-# Day One: Making a Shapiro Wilk Test for GRE scores in grad school applications
+# Day One
+
+### Making a Shapiro Wilk Test for GRE scores in grad school applications
 
 ```{r}
-library(readr) # call library you need
+library(tidyverse) # call library you need - tidyverse includes readr
+
 grad_school <- read_csv("grad_school.csv") # read in necessary file about graduate school
 ```
 
-
-To plot a histogram of, for example, the GRE scores of the applicants, you could run the command below. We use the **$** operator to reference the columns of the dataset by name.
+To plot a histogram of, for example, the GRE scores of the applicants, you could run the command below. We use the **$** operator to reference the columns of the dataset by name. This uses the base plotting function. While not ggplot, it is sometimes easier for quick-and-dirty plotting, and the _curve()_ function works really welll with Base R plotting (i.e. not ggplot2), so the following graph is really useful.
 
 ```{r}
 hist(grad_school$gre) # makes a histogram of GRE scores
@@ -37,7 +39,7 @@ Here's the results of the Shapiro-Wilk test. If you've taken a statistics class,
 mean(grad_school$gre) # get mean of grad school gre scores
 sd(grad_school$gre) # get standard deviation of grad school gre scores
 hist(grad_school$gre, freq=F, xlim=c(280,360)) # relative frequency histogram with custom x axis limits
-curve(dnorm(x, mean=316.8075, sd=11.47365), add=TRUE, col="darkblue", lwd=2) # curves a normal distribution atop a frequency histogram
+curve(dnorm(x, mean=316.8075, sd=11.47365), add=TRUE, col="darkblue", lwd=2) # curves a normal distribution atop a frequency histogram, used better with base plotting than with ggplot2
 ```
 
 
@@ -45,15 +47,7 @@ curve(dnorm(x, mean=316.8075, sd=11.47365), add=TRUE, col="darkblue", lwd=2) # c
 
 ### Built-in Datasets
 
-R has built-in datasets that many people use, especially when trying to provide a reproducible example (reprex) when asking for help or debugging. These datasets can be found using the _data()_ function. Popular ones are:
-
-```{r}
-head(mtcars) # motorcars
-```
-
-```{r}
-head(diamonds) # diamond dataset. Are diamonds a girls' best friend? This girl doesn't love diamonds, especially blood ones.
-```
+R has built-in datasets that many people use, especially when trying to provide a reproducible example (reprex) when asking for help or debugging. These datasets can be found using the _data()_ function.
 
 ## Pivot Longer
 
@@ -74,10 +68,23 @@ Enter _pivot_longer()_ from dplyr. We use the pipe! In pivot longer, the first a
 
 ```{r}
 long_spotify <- short_spotify %>%
-  pivot_longer(cols=c("popularity","duration","dB","bpm"),names_to="type of metric", values_to="score")
+  pivot_longer(cols=c("popularity","duration","dB","bpm"),names_to="type_of_metric", values_to="score")
+
+head(long_spotify)
 ```
 
 ## Pivot Wider
+
+In _pivot_wider()_, the same concept is utilized except. Below, I remake (and thus undo my long pivot) to create the same data frame with my long spotify data.
+
+```{r}
+short_spotify_again <- long_spotify %>%
+  pivot_wider(names_from = "type_of_metric", values_from = "score")
+
+head(short_spotify_again)
+```
+
+Pivoting is really useful because it changes the shape of data - sometimes certain functions need data to be structured a certain way.
 
 # Day 3: Iris Analyses
 
@@ -92,7 +99,7 @@ iris <- read_csv("Iris.csv")
 ### Petal Length, Petal Width
 
 ```{r}
-ggplot(iris, aes(x=Petal.Length, y=Petal.Width, color=Species)) +
+ggplot(iris, aes(x=petal_length, y=petal_width, color=species)) +
   geom_point() +
   labs(x="Petal Length", y="Petal Width", title="Petal Length vs. Petal Width, Sorted by Species")
 ```
@@ -101,19 +108,21 @@ ggplot(iris, aes(x=Petal.Length, y=Petal.Width, color=Species)) +
 A boxplot of sepal length by species is below.
 
 ```{r}
-ggplot(iris, aes(x=Sepal.Length, group=Species, y=Species, fill=Species)) +
-  geom_boxplot()
+ggplot(iris, aes(x=sepal_length, group=species, y=species, fill=species)) +
+  geom_boxplot() +
+  labs(x="Sepal Length", y="Species", title="Sepal Length by Species")
 ```
 
-We can see from the boxplot and scatterplot thatvirginica is consistently the largest flower. One of the things that we might consider is examining the ratio of flower sizes. Sometimes that changes things!
+We can see from the boxplot and scatterplot that virginica is consistently the largest flower. One of the things that we might consider is examining the ratio of flower sizes. Sometimes that changes things!
 
 To do this we are going to use dplyr & ggplot2.
 
 ```{r}
 iris %>%
-  mutate(petal_ratio = Petal.Length/Petal.Width) %>%
-  ggplot(aes(x=petal_ratio, y=Species, group=Species, fill=Species)) +
-  geom_boxplot()
+  mutate(petal_ratio = petal_length / petal_width) %>%
+  ggplot(aes(x=petal_ratio, y=species, group=species, fill=species)) +
+  geom_boxplot() +
+  labs(x="Petal Ratio", y="Species", title="Petal Ratio by Species of Iris")
 ```
 
 We can see that virginica is clearly the largest flower but has a different (smaller) petal length to petal width ratio than the other flowers.
