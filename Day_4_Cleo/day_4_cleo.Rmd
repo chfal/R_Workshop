@@ -1,0 +1,146 @@
+---
+title: "Day 4: Malaria Prevalence"
+author: "Cleo Falvey, Filip Stefanovic, & Sydney Horan"
+date: "3/7/2021"
+output: html_document
+---
+
+## Making Graphs about Malaria Outbreaks Over Time
+
+Good morning! Welcome to Day 4. Today, we'll be showing you how to make graphs about malaria outbreaks over time. But before, we do that, we need to load all necessary packages. The Tidyverse is always a good place to start.
+
+```{r}
+
+library(tidyverse) # for tidying
+library(scales) # for renaming labels
+
+```
+
+### Reading In Data
+
+Next, we download the data from Gapminder. You can choose any data set, but I wanted to choose a data set that was standardized by population size (i.e., cases per 100k people.) When you do your project, you can choose either case counts or cases per population, but keep in mind that countries with larger populations (will likely) have higher case counts.
+
+```{r}
+# read  in dataset with read_csV()
+malaria <- read_csv("malaria_cases_per_100000_reported.csv")
+
+# check data appearance with head()
+head(malaria)
+```
+
+Looking at the data, we can see we have case count data that's grouped by both country and year. This structure of data is fairly typical for epidemiological data.
+
+### Cleaning Data
+
+The next step in the pathway is cleaning our data. What I'm doing right here is pivoting this data from "long" to "wide." You can see the difference once the *head()* function is called. The *pivot_longer()* function takes the columns that we are pivoting - notice I indexed them numerically (and that arrays in R start at 1). The next part of the pivoting argument simply helps us understand what we are renaming the variables to when we look at our new data set.
+
+```{r}
+# clean data
+malaria_longer <- malaria %>% # data cleaning
+  pivot_longer(cols = 2:18,
+               names_to = "year",
+               values_to = "cases") # long format because the years as a title of the columns was not helping because we wouldn't then be able to graph by year as easily
+
+head(malaria_longer) # this shows how our data set looks now
+
+
+```
+
+### Manipulating Data
+
+I want to calculate the countries that have the highest and lowest cases of malaria in our year span. I did this using a simple average (your methods may vary). To do this, I created a new object, *most_malaria*, which used several *dplyr* verbs.
+
+```{r}
+most_malaria <- malaria_longer %>% #take old dataset
+  group_by(country) %>% # group by country
+  summarize_if(is.numeric, mean, na.rm=T) %>% #summarize by the mean
+  arrange(desc(cases)) # arrange by descending order
+
+
+# If you want, try grouping by year instead of country and calcualting which year had the worst cases of malaria.
+
+```
+
+But now that we have our simple averages, here are two data tables showing countries with the highest and least prevalence of malaria on average across the time span selected (1990-2006). Now that we know what these countries are, we will graph these countries to see what trends emerge.
+
+(Side note: Don't get too caught up in the meaning of the numbers in the tibbles below. We mostly just calculated this to see what the countries were.)
+
+```{r}
+head(most_malaria) # highest malaria cases
+
+tail(most_malaria) # lowest malaria cases
+
+# create a character vector of all of the interesting countries - highest and lowest - so we can select them
+
+interesting_countries <- c("Zambia", "Malawi","Sao Tome and Principe","Tanzania","Solomon Islands","Egypt","Morocco","Turkmenistan","Russia","Uzbekistan")  # remember, we always put characters in quotes!
+
+```
+
+### Graphing Data
+
+Now that we have our data manipulated and cleaned, let's graph and tell a story. This is the first graph I made.
+
+```{r}
+malaria_longer %>% # take malaria dataset
+  filter(country %in% interesting_countries) %>% #filter to interesting countries
+  ggplot(aes(x=year, y=cases, color=country)) + # set up ggplot
+  geom_point() + #add what geometry we want
+  scale_x_discrete(breaks=pretty_breaks()) + # fix messy scales
+  labs(title="Malaria Cases in the Top 5 Highest and Lowest Countries")
+```
+
+Do you see any issues with the graph above? One of *my* biggest issues with it is that it's too much data to display - the scales are wildly different between the top five highest and lowest countries. Let's make two different ones.
+
+### Highest Prevalence Countries
+
+```{r}
+highest_countries <- c("Zambia", "Malawi","Sao Tome and Principe","Tanzania","Solomon Islands")
+
+# highest prevalence
+malaria_longer %>% # take malaria dataset
+  filter(country %in% highest_countries) %>% #filter to interesting countries
+  ggplot(aes(x=year, y=cases, color=country)) + # set up ggplot
+  geom_point() + #add what geometry we want
+  scale_x_discrete(breaks=pretty_breaks()) + # fix messy scales
+  labs(title="Malaria Cases in the Top 5 Highest Countries")
+
+
+```
+
+### Lowest Prevalence Countries
+
+```{r}
+lowest_countries <- c("Morocco","Turkmenistan","Russia","Uzbekistan", "Egypt")  # remember, we always put characters in quotes!
+
+# lowest prevalence
+malaria_longer %>% # take malaria dataset
+  filter(country %in% lowest_countries) %>% #filter to interesting countries
+  ggplot(aes(x=year, y=cases, color=country)) + # set up ggplot
+  geom_point() + #add what geometry we want
+  scale_x_discrete(breaks=pretty_breaks()) + # fix messy scales
+  labs(title="Malaria Cases in the Top 5 Lowest Countries") +
+  scale_color_brewer(palette="Set1")
+  
+```
+
+### Synthesizing and Researching
+
+Now that we've made our graphs, let's do some research. We could look at what the lowest prevalence countries have in common - is it a lack of mosquitoes? A public health campaign that successfully eradicated malaria? What do the highest prevalence countries have in common? An aging medical infrastructure? Lack of access to health care due because of economic factors? Lots and lots of mosquitoes? Here are a few journal articles (scientific, scholarly) which I think might be worth reading and citing if I were doing this project.
+
+#### Journal Articles
+
+-   Malaria in Tanzania: <https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0009396>
+-   Malaria in Egypt: <https://www.cdc.gov/malaria/new_info/2014/malariaegypt.htm>
+-   Malaria Containment Strategies: <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4921733/>
+-   More about Malaria Containment Strategies: <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4774904/>
+
+### Tips and Tricks
+
+Remember, as you do more research, you may uncover more interesting things to graph! This is a fluid process and involves a lot of trial and error to figure out what's the best story to tell and what might make sense or not.
+
+### Miscellaneous Takeaways
+
+-   Research is a journey and (sometimes) a garbage fire, so just be patient, kind to yourself, and take lots of breaks. I personally eat lots of chocolate to cope with the struggles.
+-   Think about what makes a graph look good. Is it colorful (and colorblind-friendly)? Is it clear? Do the labels look good? Is the key clear? Did you correctly set up your axes and choose the right style of *geom*?
+-   Again, emphasis on story-first data. People who you explain your science to won't have seen your science for nearly as long as you have spent researching it. Make sure it can be digestible, entertaining, and memorable!
+-   Use *%in%* to filter to multiple character vectors. Create the character vector first using the *c()* function, then filter.

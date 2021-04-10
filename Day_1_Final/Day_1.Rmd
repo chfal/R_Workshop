@@ -84,6 +84,7 @@ x <- c(12,3,15,20,5)
 
 # Now, you try! Create a new variable y that stores any five numbers.
 
+y <- c(7,12,72,9,5)
 
 ```
 
@@ -104,7 +105,7 @@ summary(x) # provides min, 1st quartile, median, mean, 3rd quartile, max
 
 # Now, you try! Run summary() on your vector, y.
 
-
+summary(y)
 
 ```
 
@@ -120,18 +121,23 @@ alphabet <- c("a","b","c","d","e")
 
 # Now, you try! Create a vector that holds any words you like. Remember strings and characters go in quotes!
 
-
+pets <- c("Rufus", "Walter", "Phineas")
 
 ```
 
 There are also logical variables (TRUE/FALSE). These are also sometimes called boolean variables.
 
 ```{r}
+
 boolean <- c(TRUE, FALSE, NA, TRUE, FALSE)
 
 # Now, you try! Create a boolean variable called boolean2 which has value TRUE TRUE FALSE FALSE, or any TRUE/FALSE variables you like. Remember that TRUE and FALSE should be capitalized, but without quotes. 
 
 # Side note: R stores TRUE as 1 and FALSE as 0, so you can even do math with it (useful for proportions and binary).
+
+boolean2 <- c(TRUE, TRUE, FALSE, FALSE)
+
+mean(boolean2)
 
 ```
 
@@ -251,6 +257,19 @@ summary(gre_gpa) # this makes a summary of your linear model
 ```{r}
 # Now, you try! Using the grad_school dataset, make a linear model that correlates the qualitative score an applicant received on their purpose statement and their letters of recommendation.
 # If you're feeling brave, try to plot it with ggplot2!
+ggplot(grad_school, aes(x=purpose_statement, y=letters_rec)) + # call ggplot(dataset, aes(x,y))
+  geom_point(aes(color = university_ranking)) + # we want to make a point graph that distingushes the scools ranking 
+  geom_smooth(method="lm") + # add the line atop, using the linear model method
+  labs(
+    title="Relationship Between Letters of Rec Scores and Personal Statement",
+    color = "University Ranking"
+    ) # title on top, rename the legend
+
+
+letters_rec <- lm(formula=letters_rec~purpose_statement, data = grad_school) # this makes a model
+
+
+summary(letters_rec) # this makes a summary of your linear model
 
 ```
 

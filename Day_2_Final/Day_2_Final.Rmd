@@ -40,7 +40,7 @@ Don't forget! R should have imported the data frame as a **Tibble** (a very cute
 
 ```{r}
 
-spotify <- read_csv("spotify.csv")
+spotify <- read.csv("spotify.csv", encoding="ASCII")
 
 ```
 
@@ -280,3 +280,24 @@ knitr::include_graphics("ggplot2.png")
 ```
 
 ### Stay tuned for our third day of content, where we'll be putting it all together - readr, dplyr, and ggplot2. We'll also be working in small groups :)
+
+```{r}
+ggplot(spotify, aes(x=artist, y=popularity)) +
+  geom_point()
+```
+
+```{r}
+
+ggplot(spotify, aes(dB, bpm)) +
+  geom_point(color="purple") +
+  xlim(-20,0) +
+  theme_classic()
+
+asdf <- spotify %>%
+  filter(artist == "Lady Gaga" | artist == "Katy " )
+```
+
+```{r}
+
+```
+
